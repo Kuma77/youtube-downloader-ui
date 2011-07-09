@@ -7,6 +7,9 @@ LIBS=`$(PKGCONFIG) --libs $(PACKAGES)`
 
 all: $(PROGRAM)
 
+clean:
+	-rm -f $(PROGRAM).o
+
 $(PROGRAM): $(PROGRAM).o
 	$(CC) $^ -o $@ $(LIBS)
 
