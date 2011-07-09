@@ -6,7 +6,7 @@
 #define REGEX "^\\[download\\] +([0-9]{1,3}\\.[0-9])% of ([0-9]+\\.[0-9]+)([Mk]) " \
               "at +([0-9]+\\.[0-9]{2})([Mk]/s) ETA 0?([0-9]{1,2}):0?([0-9]{1,2}).*$"
 
-#define pluralize(string, singular, plural) (string[0] == '1' ? singular : plural)
+#define pluralize(string, singular, plural) ((string[0] == '1' && string[1] == '\0') ? singular : plural)
 
 typedef struct _UI UI;
 
