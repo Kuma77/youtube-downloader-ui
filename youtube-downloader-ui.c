@@ -8,15 +8,13 @@
 
 #define pluralize(string, singular, plural) ((string[0] == '1' && string[1] == '\0') ? singular : plural)
 
-typedef struct _UI UI;
-
-struct _UI
+typedef struct
 {
 	GtkWidget *box;
 	GtkWidget *entry;
 	GtkWidget *progress;
 	GtkWidget *label;
-};
+} UI;
 
 gboolean updating = FALSE;
 
@@ -35,13 +33,14 @@ main (int argc, char **argv)
 	GtkWidget *content;
 	GtkWidget *label;
 	GtkWidget *button;
+	GError *error;
 	UI *ui;
 
 	gtk_init (&argc, &argv);
 
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	content = gtk_vbox_new (FALSE, 6);
-	label = gtk_label_new ("Dirección");
+	label = gtk_label_new ("Dirección del vídeo:");
 	button = gtk_button_new_with_mnemonic ("_Descargar");
 
 	ui = g_new0 (UI, 1);
@@ -50,7 +49,10 @@ main (int argc, char **argv)
 	ui->progress = gtk_progress_bar_new ();
 	ui->label = gtk_label_new ("");
 
-	gtk_window_set_title (GTK_WINDOW (window), "Youtube downloader UI");
+	error = NULL;
+
+	gtk_window_set_title (GTK_WINDOW (window), "Youtube downloader");
+	gtk_window_set_icon_from_file (GTK_WINDOW (window), "icon.png", &error);
 	gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (ui->progress), TRUE);
 	gtk_progress_bar_set_text (GTK_PROGRESS_BAR (ui->progress), " ");
 	gtk_entry_set_width_chars (GTK_ENTRY (ui->entry), 42);
@@ -58,6 +60,12 @@ main (int argc, char **argv)
 	gtk_misc_set_alignment (GTK_MISC (ui->label), 0.0, 0.5);
 	gtk_label_set_use_markup (GTK_LABEL (ui->label), TRUE);
 	gtk_container_set_border_width (GTK_CONTAINER (window), 12);
+
+	if (error)
+	{
+		g_warning ("Error: %s", error->message);
+		g_error_free (error);
+	}
 
 	gtk_container_add (GTK_CONTAINER (window), content);
 	gtk_container_add (GTK_CONTAINER (content), ui->box);
@@ -244,9 +252,7 @@ static gboolean
 update (UI *ui)
 {
 	if (updating)
-	{
 		gtk_progress_bar_pulse (GTK_PROGRESS_BAR (ui->progress));
-	}
 	else
 	{
 		gtk_progress_bar_set_text (GTK_PROGRESS_BAR (ui->progress), " ");
@@ -294,9 +300,8 @@ execute (GtkButton *button, UI *ui)
 			g_free (message);
 		}
 		else
-		{
 			gtk_label_set_text (GTK_LABEL (ui->label), "g_spawn_async_with_pipes failed");
-		}
+
 		return;
 	}
 
